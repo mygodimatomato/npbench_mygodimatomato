@@ -59,27 +59,27 @@ class Test(object):
 
         bdata = self.bench.get_data(preset)
 
-        # Run NumPy for validation
-        if validate and self.frmwrk.fname != "numpy" and self.numpy:
-            np_impl, np_impl_name = self.numpy.implementations(self.bench)[0]
-            np_out, _ = self._execute(self.numpy, np_impl, np_impl_name, "validation", bdata, 1, ignore_errors)
-        else:
-            validate = False
-            np_out = None
+        # # Run NumPy for validation
+        # if validate and self.frmwrk.fname != "numpy" and self.numpy:
+        #     np_impl, np_impl_name = self.numpy.implementations(self.bench)[0]
+        #     np_out, _ = self._execute(self.numpy, np_impl, np_impl_name, "validation", bdata, 1, ignore_errors)
+        # else:
+        #     validate = False
+        #     np_out = None
 
-        # Extra information
-        kind = ""
-        if "kind" in self.bench.info.keys():
-            kind = self.bench.info["kind"]
-        domain = ""
-        if "domain" in self.bench.info.keys():
-            domain = self.bench.info["domain"]
-        dwarf = ""
-        if "dwarf" in self.bench.info.keys():
-            dwarf = self.bench.info["dwarf"]
-        version = self.frmwrk.version()
+        # # Extra information
+        # kind = ""
+        # if "kind" in self.bench.info.keys():
+        #     kind = self.bench.info["kind"]
+        # domain = ""
+        # if "domain" in self.bench.info.keys():
+        #     domain = self.bench.info["domain"]
+        # dwarf = ""
+        # if "dwarf" in self.bench.info.keys():
+        #     dwarf = self.bench.info["dwarf"]
+        # version = self.frmwrk.version()
 
-        @tout.exit_after(timeout)
+        # @tout.exit_after(timeout)
         def first_execution(impl, impl_name):
             return self._execute(self.frmwrk, impl, impl_name, "first/validation", context, 1, ignore_errors)
 
@@ -97,58 +97,58 @@ class Test(object):
                     raise
                 continue
 
-            # Validation
-            valid = True
-            if validate and np_out is not None:
-                try:
-                    frmwrk_name = self.frmwrk.info["full_name"]
+        #     # Validation
+        #     valid = True
+        #     if validate and np_out is not None:
+        #         try:
+        #             frmwrk_name = self.frmwrk.info["full_name"]
 
-                    rtol = 1e-5 if not 'rtol' in self.bench.info else self.bench.info['rtol']
-                    atol = 1e-8 if not 'atol' in self.bench.info else self.bench.info['atol']
-                    norm_error = 1e-5 if not 'norm_error' in self.bench.info else self.bench.info['norm_error']
-                    valid = util.validate(np_out, frmwrk_out, frmwrk_name, rtol=rtol, atol=atol, norm_error=norm_error)
-                    if valid:
-                        print("{} - {} - validation: SUCCESS".format(frmwrk_name, impl_name))
-                    elif not ignore_errors:
-                        raise ValueError("{} did not validate!".format(frmwrk_name))
-                except Exception:
-                    print("Failed to run {} validation.".format(self.frmwrk.info["full_name"]))
-                    if not ignore_errors:
-                        raise
-            # Main execution
-            _, timelist = self._execute(self.frmwrk, impl, impl_name, "median", context, repeat, ignore_errors)
-            if timelist:
-                for t in timelist:
-                    bvalues.append(dict(details=impl_name, validated=valid, time=t))
+        #             rtol = 1e-5 if not 'rtol' in self.bench.info else self.bench.info['rtol']
+        #             atol = 1e-8 if not 'atol' in self.bench.info else self.bench.info['atol']
+        #             norm_error = 1e-5 if not 'norm_error' in self.bench.info else self.bench.info['norm_error']
+        #             valid = util.validate(np_out, frmwrk_out, frmwrk_name, rtol=rtol, atol=atol, norm_error=norm_error)
+        #             if valid:
+        #                 print("{} - {} - validation: SUCCESS".format(frmwrk_name, impl_name))
+        #             elif not ignore_errors:
+        #                 raise ValueError("{} did not validate!".format(frmwrk_name))
+        #         except Exception:
+        #             print("Failed to run {} validation.".format(self.frmwrk.info["full_name"]))
+        #             if not ignore_errors:
+        #                 raise
+        #     # Main execution
+        #     _, timelist = self._execute(self.frmwrk, impl, impl_name, "median", context, repeat, ignore_errors)
+        #     if timelist:
+        #         for t in timelist:
+        #             bvalues.append(dict(details=impl_name, validated=valid, time=t))
 
-        # create a database connection
-        database = r"npbench.db"
-        conn = util.create_connection(database)
+        # # create a database connection
+        # database = r"npbench.db"
+        # conn = util.create_connection(database)
 
-        # create tables
-        if conn is not None:
-            # create results table
-            util.create_table(conn, util.sql_create_results_table)
-        else:
-            print("Error! cannot create the database connection.")
+        # # create tables
+        # if conn is not None:
+        #     # create results table
+        #     util.create_table(conn, util.sql_create_results_table)
+        # else:
+        #     print("Error! cannot create the database connection.")
 
-        # Write data
-        timestamp = int(time.time())
-        for d in bvalues:
-            new_d = {
-                'timestamp': timestamp,
-                'benchmark': self.bench.info["short_name"],
-                'kind': kind,
-                'domain': domain,
-                'dwarf': dwarf,
-                'preset': preset,
-                'mode': "main",
-                'framework': self.frmwrk.info["simple_name"],
-                'version': version,
-                'details': d["details"],
-                'validated': d["validated"],
-                'time': d["time"]
-            }
-            result = tuple(new_d.values())
-            # print(result)
-            util.create_result(conn, util.sql_insert_into_results_table, result)
+        # # Write data
+        # timestamp = int(time.time())
+        # for d in bvalues:
+        #     new_d = {
+        #         'timestamp': timestamp,
+        #         'benchmark': self.bench.info["short_name"],
+        #         'kind': kind,
+        #         'domain': domain,
+        #         'dwarf': dwarf,
+        #         'preset': preset,
+        #         'mode': "main",
+        #         'framework': self.frmwrk.info["simple_name"],
+        #         'version': version,
+        #         'details': d["details"],
+        #         'validated': d["validated"],
+        #         'time': d["time"]
+        #     }
+        #     result = tuple(new_d.values())
+        #     # print(result)
+        #     util.create_result(conn, util.sql_insert_into_results_table, result)

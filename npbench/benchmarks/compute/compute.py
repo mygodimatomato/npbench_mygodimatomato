@@ -4,6 +4,7 @@ import numpy as np
 
 
 def initialize(M, N):
+    print(f"Generating inputs for M={M}, N={N}")
     from numpy.random import default_rng
     rng = default_rng(42)
     array_1 = rng.uniform(0, 1000, size=(M, N)).astype(np.int64)

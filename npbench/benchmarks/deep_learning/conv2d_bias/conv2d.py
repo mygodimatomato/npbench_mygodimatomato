@@ -4,6 +4,7 @@ import numpy as np
 
 
 def initialize(C_in, C_out, H, K, N, W):
+    print(f"Generating inputs for C_in={C_in}, C_out={C_out}, H={H}, K={K}, N={N}, W={W}")
     from numpy.random import default_rng
     rng = default_rng(42)
     # NHWC data layout
